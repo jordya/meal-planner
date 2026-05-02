@@ -649,36 +649,34 @@ export default function MealPlanner() {
               const doSwap = swapping === idx;
               return (
                 <div key={idx} className="card">
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 2 }}>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: "#2563eb", textTransform: "uppercase", letterSpacing: ".07em", flexShrink: 0 }}>{d.day}</span>
-                        <span style={{ fontSize: 16, fontWeight: 700, color: "#0f172a" }}>{d.name}</span>
+                  <div style={{ marginBottom: 8 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 2 }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: "#2563eb", textTransform: "uppercase", letterSpacing: ".07em", flexShrink: 0 }}>{d.day}</span>
+                      <span style={{ fontSize: 16, fontWeight: 700, color: "#0f172a" }}>{d.name}</span>
+                    </div>
+                    {d.details && <p style={{ fontSize: 14, color: "#64748b", marginTop: 2 }}>{d.details}</p>}
+                    {d.sides?.length > 0 && (
+                      <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 6 }}>
+                        {d.sides.map((s, i) => <span key={i} className="pill green">+ {s}</span>)}
                       </div>
-                      {d.details && <p style={{ fontSize: 14, color: "#64748b", marginTop: 2 }}>{d.details}</p>}
-                      {d.sides?.length > 0 && (
-                        <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 6 }}>
-                          {d.sides.map((s, i) => <span key={i} className="pill green">+ {s}</span>)}
-                        </div>
-                      )}
-                    </div>
-                    <div style={{ display: "flex", gap: 5, flexShrink: 0, flexWrap: "wrap", justifyContent: "flex-end" }}>
-                      {d.prep?.length > 0 && (
-                        <button className={`smbtn btn ${prepOpen ? "blue" : ""}`} onClick={() => toggle(`prep${idx}`)}>
-                          📝 {prepOpen ? "Hide prep" : "Prep"}
-                        </button>
-                      )}
-                      {d.variations?.length > 0 && (
-                        <button className={`smbtn btn ${open ? "blue" : ""}`} onClick={() => toggle(key)}>
-                          💡 {open ? "Hide tips" : "Tips"}
-                        </button>
-                      )}
-                      {doSwap
-                        ? <button className="smbtn btn green" onClick={() => swapWithAlt(idx)}>✓ Use alt</button>
-                        : <button className="smbtn btn" onClick={() => setSwapping(doSwap ? null : idx)}>⇄ Alt</button>
-                      }
-                      <button className="smbtn btn blue" onClick={() => openPicker(idx)}>📋 Change</button>
-                    </div>
+                    )}
+                  </div>
+                  <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+                    {d.prep?.length > 0 && (
+                      <button className={`smbtn btn ${prepOpen ? "blue" : ""}`} onClick={() => toggle(`prep${idx}`)}>
+                        📝 {prepOpen ? "Hide prep" : "Prep"}
+                      </button>
+                    )}
+                    {d.variations?.length > 0 && (
+                      <button className={`smbtn btn ${open ? "blue" : ""}`} onClick={() => toggle(key)}>
+                        💡 {open ? "Hide tips" : "Tips"}
+                      </button>
+                    )}
+                    {doSwap
+                      ? <button className="smbtn btn green" onClick={() => swapWithAlt(idx)}>✓ Use alt</button>
+                      : <button className="smbtn btn" onClick={() => setSwapping(doSwap ? null : idx)}>⇄ Alt</button>
+                    }
+                    <button className="smbtn btn blue" onClick={() => openPicker(idx)}>📋 Change</button>
                   </div>
 
                   {prepOpen && d.prep?.length > 0 && (
