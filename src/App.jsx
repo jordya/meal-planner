@@ -307,12 +307,30 @@ function generateWeek(dinners, lunches) {
 const EMPTY_DINNER = { name: "", details: "", sides: "", variations: "", ingredients: "", prep: "" };
 const EMPTY_LUNCH = { type: "Salad", protein: "", base: "", sauce: "", extras: "", variations: "", ingredients: "", prep: "" };
 
+// ── localStorage helpers ──
+const STORAGE_KEYS = { dinners: "mp_dinners", lunches: "mp_lunches", week: "mp_week" };
+
+function loadFromStorage(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) return JSON.parse(raw);
+  } catch (e) { /* ignore */ }
+  return fallback;
+}
+
+function saveToStorage(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { /* ignore */ }
+}
+
 export default function MealPlanner() {
-  const [dinners, setDinners] = useState(DEFAULT_DINNERS);
-  const [lunches, setLunches] = useState(DEFAULT_LUNCHES);
-  const [week, setWeek] = useState(() => generateWeek(DEFAULT_DINNERS, DEFAULT_LUNCHES));
+  const [dinners, setDinnersRaw] = useState(() => loadFromStorage(STORAGE_KEYS.dinners, DEFAULT_DINNERS));
+  const [lunches, setLunchesRaw] = useState(() => loadFromStorage(STORAGE_KEYS.lunches, DEFAULT_LUNCHES));
+  const [week, setWeekRaw] = useState(() => {
+    const saved = loadFromStorage(STORAGE_KEYS.week, null);
+    return saved || generateWeek(DEFAULT_DINNERS, DEFAULT_LUNCHES);
+  });
   const [tab, setTab] = useState("plan");
-  const [groceryView, setGroceryView] = useState("full"); // "full" | "bymeal"
+  const [groceryView, setGroceryView] = useState("full");
   const [swapping, setSwapping] = useState(null);
   const [expanded, setExpanded] = useState({});
   const [copied, setCopied] = useState(false);
@@ -323,11 +341,37 @@ export default function MealPlanner() {
   const [addSuccess, setAddSuccess] = useState("");
   const [showList, setShowList] = useState(false);
 
+  // Persist-on-change wrappers
+  const setDinners = useCallback((updater) => {
+    setDinnersRaw(prev => {
+      const next = typeof updater === "function" ? updater(prev) : updater;
+      saveToStorage(STORAGE_KEYS.dinners, next);
+      return next;
+    });
+  }, []);
+
+  const setLunches = useCallback((updater) => {
+    setLunchesRaw(prev => {
+      const next = typeof updater === "function" ? updater(prev) : updater;
+      saveToStorage(STORAGE_KEYS.lunches, next);
+      return next;
+    });
+  }, []);
+
+  const setWeek = useCallback((updater) => {
+    setWeekRaw(prev => {
+      const next = typeof updater === "function" ? updater(prev) : updater;
+      saveToStorage(STORAGE_KEYS.week, next);
+      return next;
+    });
+  }, []);
+
   const regenerate = useCallback(() => {
-    setWeek(generateWeek(dinners, lunches));
+    const newWeek = generateWeek(dinners, lunches);
+    setWeek(newWeek);
     setSwapping(null);
     setExpanded({});
-  }, [dinners, lunches]);
+  }, [dinners, lunches, setWeek]);
 
   const swapWithAlt = useCallback((idx) => {
     setWeek(prev => {
